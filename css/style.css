@@ -1,5 +1,5 @@
 body {
-    background-image: url("../assets/img/fondo_menu.jpg");
+    background-image: url("../assets/img/fondo.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -8,18 +8,26 @@ body {
 
 .arcade-title {
     font-size: 1.5rem;
-    text-shadow:
-            0 0 5px #ff0,
-            0 0 10px #ff0,
-            0 0 20px #f00,
-            0 0 30px #f00;
+    text-shadow: 0 0 5px #ff0,
+    0 0 10px #ff0,
+    0 0 20px #f00,
+    0 0 30px #f00;
     animation: neonFlicker 1.5s infinite alternate;
 }
 
 @keyframes neonFlicker {
-    0%   { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
-    50%  { opacity: 0.8; text-shadow: 0 0 15px #f00, 0 0 25px #f00; }
-    100% { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+    0% {
+        opacity: 1;
+        text-shadow: 0 0 5px #ff0, 0 0 10px #ff0;
+    }
+    50% {
+        opacity: 0.8;
+        text-shadow: 0 0 15px #f00, 0 0 25px #f00;
+    }
+    100% {
+        opacity: 1;
+        text-shadow: 0 0 5px #ff0, 0 0 10px #ff0;
+    }
 }
 
 .arcade-btn {
@@ -40,4 +48,30 @@ body {
     .lead {
         font-size: 0.7rem;
     }
+}
+
+@keyframes rotarMoneda {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rotarPortal {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.moneda {
+    animation: rotarMoneda 2s linear infinite;
+}
+
+.portal {
+    animation: rotarPortal 4s linear infinite;
 }

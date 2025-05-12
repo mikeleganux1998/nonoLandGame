@@ -1,10 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Nivel 1 - Ñoño Land</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            font-family: 'Press Start 2P', cursive;
+            background-image: url("assets/img/fondo.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #juegoCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            width: 100%;
+            text-align: center;
+            color: yellow;
+            font-size: 14px;
+            z-index: 10;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .arcade-title {
+            font-size: 1.5rem;
+            text-align: center;
+            color: yellow;
+            text-shadow:
+                    0 0 5px #ff0,
+                    0 0 10px #ff0,
+                    0 0 20px #f00,
+                    0 0 30px #f00;
+            animation: neonFlicker 1.5s infinite alternate;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            display: none;
+        }
+
+        .arcade-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            padding: 1rem 2rem;
+            background-color: black;
+            color: yellow;
+            border: 3px solid yellow;
+            position: absolute;
+            top: 65%; /* Ajustado de 50% a 65% */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            cursor: pointer;
+            display: none;
+        }
+        @keyframes neonFlicker {
+            0% { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+            50% { opacity: 0.8; text-shadow: 0 0 15px #f00, 0 0 25px #f00; }
+            100% { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+        }
+    </style>
 </head>
 <body>
+
+<div id="hud">
+    Monedas: <span id="monedasContador">0</span> | Ítems: <span id="itemsContador">0</span>
+</div>
+
+<div id="nivelCompletadoTitulo" class="arcade-title">¡Nivel Completado!</div>
+
+<button id="continuar-btn" class="arcade-btn" onclick="window.location.href='nivel2.html'">Ir al Nivel 2</button>
+
+<canvas id="juegoCanvas"></canvas>
+
+<script src="js/nivel1.js"></script>
 
 </body>
 </html>

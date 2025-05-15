@@ -1,4 +1,25 @@
-const canvas = document.getElementById('juegoCanvas');
+// JS DEL NIVEL 1
+
+import { estadoJuego } from './estadoJuego.js';
+
+
+// Sonidos
+const sonidoSalto = new Audio('assets/audio/salto.mp3');
+const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
+
+// Evita delay en primera reproducción (buffering)
+[sonidoSalto, sonidoMoneda].forEach(sonido => {
+    sonido.load();
+});
+
+sonidoSalto.volume = 0.5;
+sonidoMoneda.volume = 0.5;
+
+// Inicializa contadores con los valores guardados
+$('#monedasContador').text(estadoJuego.monedas);
+$('#itemsContador').text(estadoJuego.items);
+
+const canvas = $('#juegoCanvas')[0];
 const ctx = canvas.getContext('2d');
 
 canvas.width = window.innerWidth;
@@ -36,13 +57,13 @@ const jugador = {
 };
 
 const gravedad = 0.5;
-const salto = -20;
+const salto = -23;
 
 // Plataformas
 const plataformas = [
-    { x: 200, y: canvas.height - 250, width: 180, height: 20 },
-    { x: 600, y: canvas.height - 370, width: 220, height: 20 },
-    { x: canvas.width - 300, y: canvas.height - 500, width: 220, height: 20 }
+    { x: 300, y: canvas.height - 250, width: 180, height: 20 },
+    { x: 900, y: canvas.height - 430, width: 220, height: 20 },
+    { x: canvas.width - 400, y: canvas.height - 730, width: 220, height: 20 }
 ];
 
 // Monedas
@@ -56,8 +77,8 @@ const monedas = plataformas.map(p => ({
 
 let itemRecogido = false;
 const bandera = {
-    x: plataformas[2].x + 50,
-    y: plataformas[2].y - 250,
+    x: plataformas[2].x + 0,
+    y: plataformas[2].y - 150,
     width: 60,
     height: 75
 };
@@ -76,8 +97,8 @@ let anguloMoneda = 0;
 let anguloPortal = 0;
 
 const teclas = {};
-document.addEventListener('keydown', e => teclas[e.code] = true);
-document.addEventListener('keyup', e => teclas[e.code] = false);
+$(document).on('keydown', e => teclas[e.code] = true);
+$(document).on('keyup', e => teclas[e.code] = false);
 
 // Transición de nivel
 let nivelCompletado = false;
@@ -91,6 +112,8 @@ function actualizar() {
     if (teclas['Space'] && !jugador.saltando) {
         jugador.dy = salto;
         jugador.saltando = true;
+        sonidoSalto.currentTime = 0;
+        sonidoSalto.play();
     }
 
     jugador.dy += gravedad;
@@ -125,8 +148,9 @@ function actualizar() {
             jugador.y < moneda.y + MONEDA_HEIGHT &&
             jugador.y + jugador.height > moneda.y) {
             moneda.recogida = true;
-            monedasContador++;
-            document.getElementById('monedasContador').textContent = monedasContador;
+            estadoJuego.sumarMoneda();
+            sonidoMoneda.currentTime = 0;
+            sonidoMoneda.play();
         }
     });
 
@@ -136,8 +160,7 @@ function actualizar() {
         jugador.y < bandera.y + bandera.height &&
         jugador.y + jugador.height > bandera.y) {
         itemRecogido = true;
-        itemsContador++;
-        document.getElementById('itemsContador').textContent = itemsContador;
+        estadoJuego.sumarItem();
     }
 
     if (
@@ -147,11 +170,23 @@ function actualizar() {
         jugador.y + jugador.height > portal.y
     ) {
         nivelCompletado = true;
+
+        // Bloqueamos el movimiento pegándolo al centro del portal
+        jugador.x = portal.x + (portal.width - jugador.width) / 2;
+        jugador.y = portal.y + (portal.height - jugador.height) / 2;
+        jugador.dx = 0;
+        jugador.dy = 0;
+
+        // Limpiamos las teclas para que no siga moviéndose
+        teclas['ArrowLeft'] = false;
+        teclas['ArrowRight'] = false;
+        teclas['Space'] = false;
     }
 
     anguloMoneda += 3;
     anguloPortal += 1;
 }
+
 
 function dibujar() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -195,8 +230,8 @@ function dibujar() {
         ctx.drawImage(nivelCompletadoImg, canvas.width / 2 - 200, canvas.height / 2 - 100, 400, 200);
 
         // Mostrar título y botón
-        document.getElementById('nivelCompletadoTitulo').style.display = 'block';
-        document.getElementById('continuar-btn').style.display = 'block';
+        $('#nivelCompletadoTitulo').show();
+        $('#continuar-btn').show();
     }
 }
 
@@ -206,4 +241,13 @@ function bucle() {
     requestAnimationFrame(bucle);
 }
 
+const mensaje = $('#mensajeInicio');
+mensaje.show();
+
+setTimeout(() => {
+    mensaje.fadeOut(1000);
+}, 2000);
+
 bucle();
+
+

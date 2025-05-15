@@ -12,8 +12,16 @@ const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
     sonido.load();
 });
 
-sonidoSalto.volume = 0.2;
-sonidoMoneda.volume = 0.2 ;
+sonidoSalto.volume = 0.18;
+sonidoMoneda.volume = 0.18;
+
+
+// Himno instrumental
+const himno = new Audio('assets/audio/himno_instrumental.mp3');
+himno.volume = 0.2;
+himno.loop = true;
+
+let audioIniciado = false;
 
 // Inicializa contadores con los valores guardados
 $('#monedasContador').text(estadoJuego.monedas);
@@ -97,7 +105,18 @@ let anguloMoneda = 0;
 let anguloPortal = 0;
 
 const teclas = {};
-$(document).on('keydown', e => teclas[e.code] = true);
+$(document).on('keydown', e => {
+    teclas[e.code] = true;
+
+    // Inicia el himno solo una vez al primer movimiento del jugador
+    if (!audioIniciado && ['ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) {
+        himno.currentTime = 28; // ⏱️ Empieza desde el segundo 28
+        himno.play().catch(err => {
+            console.warn('El audio no pudo reproducirse automáticamente:', err);
+        });
+        audioIniciado = true;
+    }
+});
 $(document).on('keyup', e => teclas[e.code] = false);
 
 // Transición de nivel
@@ -170,6 +189,8 @@ function actualizar() {
         jugador.y + jugador.height > portal.y
     ) {
         nivelCompletado = true;
+        // Detener música
+        himno.pause();
 
         // Bloqueamos el movimiento pegándolo al centro del portal
         jugador.x = portal.x + (portal.width - jugador.width) / 2;

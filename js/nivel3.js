@@ -5,14 +5,22 @@ const sonidoSalto = new Audio('assets/audio/salto.mp3');
 const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
 const sonidoGolpe = new Audio('assets/audio/golpe.mp3');
 
+
 // Evita delay en primera reproducción (buffering)
 [sonidoSalto, sonidoMoneda, sonidoGolpe].forEach(sonido => {
     sonido.load();
 });
 
-sonidoGolpe.volume = 0.3;
-sonidoSalto.volume = 0.2;
-sonidoMoneda.volume = 0.2;
+sonidoGolpe.volume = 0.18;
+sonidoSalto.volume = 0.18;
+sonidoMoneda.volume = 0.18;
+
+
+const himnoInstrumental = new Audio('assets/audio/himno_instrumental.mp3');
+himnoInstrumental.loop = true;
+himnoInstrumental.volume = 0.2;
+himnoInstrumental.load(); // Preload para evitar delay
+
 
 $('#monedasContador').text(estadoJuego.monedas);
 $('#itemsContador').text(estadoJuego.items);
@@ -21,6 +29,9 @@ const gameOverScreen = $('#gameOverScreen');
 const reiniciarBtn = $('#reiniciarBtn');
 
 let juegoTerminado = false;
+let himnoReproducido = false;
+
+
 reiniciarBtn.on('click', () => {
     localStorage.clear();
     location.href = 'nivel1.html';
@@ -171,6 +182,14 @@ const teclas = {};
 $(document).on('keydown', e => {
     if (juegoTerminado || nivelCompletado) return;
     teclas[e.code] = true;
+
+    if (!himnoReproducido && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
+        himnoReproducido = true;
+        himnoInstrumental.currentTime = 28; // Iniciar desde el segundo 28
+        himnoInstrumental.play().catch(err => {
+            console.warn("Error al reproducir el himno:", err);
+        });
+    }
 });
 $(document).on('keyup', e => teclas[e.code] = false);
 
@@ -185,6 +204,8 @@ function actualizar() {
     if (estadoJuego.monedas <= 0 && !juegoTerminado) {
         juegoTerminado = true;
         gameOverScreen.fadeIn(300);
+        himnoInstrumental.pause();
+        himnoInstrumental.currentTime = 0;
         return;
     }
 
@@ -269,6 +290,8 @@ function actualizar() {
         if (ticketRecogido) {
             if (!nivelCompletado) { // 👈 prevenimos que se active más de una vez
                 nivelCompletado = true;
+                himnoInstrumental.pause();
+                himnoInstrumental.currentTime = 0;
                 jugador.x = novia.x + (novia.width - jugador.width) / 2;
                 jugador.y = novia.y + (novia.height - jugador.height) / 2;
                 jugador.dx = jugador.dy = 0;

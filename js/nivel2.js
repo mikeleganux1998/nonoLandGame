@@ -6,16 +6,25 @@ import { estadoJuego } from './estadoJuego.js';
 const sonidoSalto = new Audio('assets/audio/salto.mp3');
 const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
 const sonidoGolpe = new Audio('assets/audio/golpe.mp3');
+const himno = new Audio('assets/audio/himno_instrumental.mp3'); // Himno instrumental
+
 
 // Evita delay en primera reproducción (buffering)
-[sonidoSalto, sonidoMoneda, sonidoGolpe].forEach(sonido => {
+[sonidoSalto, sonidoMoneda, sonidoGolpe, himno].forEach(sonido => {
     sonido.load();
 });
 
-sonidoGolpe.volume = 0.3;
-sonidoSalto.volume = 0.2;
-sonidoMoneda.volume = 0.2;
+sonidoGolpe.volume =  0.18;
+sonidoSalto.volume =  0.18;
+sonidoMoneda.volume = 0.18;
+himno.volume = 0.2; // volumen suave para no empalmar sonidos
 
+himno.loop = true;
+himno.currentTime = 28;
+himno.play().catch(err => {
+    // Por si el navegador bloquea el autoplay
+    console.warn('Autoplay bloqueado, espera interacción del usuario para reproducir el himno.', err);
+});
 
 
 // Inicializa contadores con los valores guardados
@@ -121,6 +130,7 @@ let tiempoTransicion = 0;
 
 function actualizar() {
     if (juegoTerminado || nivelCompletado) {
+        himno.pause();
         jugador.dx = jugador.dy = 0;
         return;
     }

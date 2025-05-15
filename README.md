@@ -16,3 +16,4 @@ Solo si logra cumplir con todos estos objetivos, podrá avanzar hasta el estadio
 ---
 
 **Hecho con mucho corazón ñoño usando HTML, CSS, JS y jQuery.**
+**Desarrollado por MikeRosasDev.**

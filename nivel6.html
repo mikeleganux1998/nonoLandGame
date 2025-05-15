@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Nivel 3 - Juego</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+            font-family: 'Press Start 2P', cursive;
+            background-image: url("assets/img/fondo.png");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #juegoCanvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: yellow;
+            font-size: 14px;
+            z-index: 10;
+            border: 2px solid yellow;
+            border-radius: 8px;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        .arcade-title {
+            font-size: 1.5rem;
+            text-align: center;
+            color: yellow;
+            text-shadow:
+                    0 0 5px #ff0,
+                    0 0 10px #ff0,
+                    0 0 20px #f00,
+                    0 0 30px #f00;
+            animation: neonFlicker 1.5s infinite alternate;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            display: none;
+        }
+
+        .arcade-btn {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            padding: 1rem 2rem;
+            background-color: black;
+            color: yellow;
+            border: 3px solid yellow;
+            position: absolute;
+            top: 65%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            cursor: pointer;
+            display: none;
+        }
+
+        #nivelCompletadoTitulo {
+            display: none;
+            font-size: 2rem;
+            color: yellow;
+            text-shadow: 2px 2px 5px red;
+            position: absolute;
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+
+        #continuar-btn {
+            display: none;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.9rem;
+            padding: 1rem 2rem;
+            background-color: black;
+            color: yellow;
+            border: 3px solid yellow;
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        @keyframes neonFlicker {
+            0% { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+            50% { opacity: 0.8; text-shadow: 0 0 15px #f00, 0 0 25px #f00; }
+            100% { opacity: 1; text-shadow: 0 0 5px #ff0, 0 0 10px #ff0; }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<canvas id="juegoCanvas"></canvas>
+
+<!-- HUD con contadores -->
+<div id="hud">
+    Monedas: <span id="monedasContador">0</span> |
+    Items: <span id="itemsContador">0</span>
+</div>
+
+<div id="mensajeTicket" style="
+  display: none;
+  position: fixed;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.9);
+  color: yellow;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.2rem;
+  padding: 2rem 3rem;
+  border: 4px solid yellow;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 10000;
+  box-shadow: 0 0 20px yellow;
+  animation: aparecerMensaje 0.5s ease forwards;
+">
+    ¡Captura el ticket y salva a tu novia para entrar al estadio!
+</div>
+
+<style>
+    @keyframes aparecerMensaje {
+        from {opacity: 0; transform: translate(-50%, -60%) scale(0.8);}
+        to {opacity: 1; transform: translate(-50%, -50%) scale(1);}
+    }
+</style>
+
+<!-- Controles de finalización del nivel -->
+<div id="nivelCompletadoTitulo">¡Nivel Completado!</div>
+<button id="continuar-btn">Continuar</button>
+<div id="gameOverScreen" style="
+  display:none;
+  position: fixed;
+  top:0; left:0; width:100vw; height:100vh;
+  background: rgba(0,0,0,0.85);
+  color: red;
+  font-family: 'Press Start 2P', cursive;
+  font-size: 3rem;
+  text-align: center;
+  padding-top: 20vh;
+  z-index: 9999;
+">
+    GAME OVER<br><br>
+    <button id="reiniciarBtn" style="
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1rem;
+    padding: 1rem 2rem;
+    border: 3px solid red;
+    background: black;
+    color: red;
+    cursor: pointer;
+    margin-top: 2rem;
+  ">REINICIAR</button>
+</div>
+
+<div id="cinematicaFinal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-family: 'Press Start 2P', cursive;
+  text-align: center;
+  padding: 2rem;
+  box-sizing: border-box;
+">
+    <video id="videoCinematica" width="60%" autoplay muted style="margin-bottom: 1.5rem; border: 4px solid yellow; border-radius: 10px;">
+        <source src="assets/video/cinematica.mp4" type="video/mp4">
+        Tu navegador no soporta el video.
+    </video>
+    <h1 style="color: yellow; font-size: 1.2rem; margin-bottom: 1.5rem;">¡Felicidades! Has llegado al partido</h1>
+    <button id="finalizarJuegoBtn" style="
+      font-size: 1rem;
+      padding: 0.8rem 2rem;
+      background: yellow;
+      color: black;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    ">Finalizar Juego</button>
+</div>
+
+
+<div id="pantallaTransicion" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; opacity: 0; transition: opacity 1s;"></div>
+<audio id="audioMeta" src="assets/audio/meta.mp3" preload="auto"></audio>
+
+<script  type="module" src="js/nivel6.js"></script>
+</body>
+</html>

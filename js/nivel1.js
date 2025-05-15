@@ -2,10 +2,12 @@
 
 import { estadoJuego } from './estadoJuego.js';
 
+let vidas = 3; // Vidas iniciales
 
 // Sonidos
 const sonidoSalto = new Audio('assets/audio/salto.mp3');
 const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
+
 
 // Evita delay en primera reproducción (buffering)
 [sonidoSalto, sonidoMoneda].forEach(sonido => {
@@ -51,6 +53,9 @@ portalImg.src = 'assets/img/portal.png';
 
 const nivelCompletadoImg = new Image();
 nivelCompletadoImg.src = 'assets/img/nivel_completado.jpg';
+
+const vidaImg = new Image();
+vidaImg.src = 'assets/img/vida.png';
 
 // Jugador
 const jugador = {
@@ -166,10 +171,17 @@ function actualizar() {
             jugador.x + jugador.width > moneda.x &&
             jugador.y < moneda.y + MONEDA_HEIGHT &&
             jugador.y + jugador.height > moneda.y) {
+
             moneda.recogida = true;
             estadoJuego.sumarMoneda();
+            $('#monedasContador').text(estadoJuego.monedas);
             sonidoMoneda.currentTime = 0;
             sonidoMoneda.play();
+
+            // Verifica si ha ganado una vida
+            if (estadoJuego.monedas % 5 === 0) {
+                vidas++;
+            }
         }
     });
 
@@ -180,6 +192,7 @@ function actualizar() {
         jugador.y + jugador.height > bandera.y) {
         itemRecogido = true;
         estadoJuego.sumarItem();
+        $('#itemsContador').text(estadoJuego.items);
     }
 
     if (
@@ -212,6 +225,14 @@ function actualizar() {
 function dibujar() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(fondo, 0, 0, canvas.width, canvas.height);
+
+
+    // Mostrar vidas
+    const VIDA_WIDTH = 40;
+    const VIDA_HEIGHT = 40;
+    for (let i = 0; i < vidas; i++) {
+        ctx.drawImage(vidaImg, 10 + i * (VIDA_WIDTH + 10), 50, VIDA_WIDTH, VIDA_HEIGHT);
+    }
 
     ctx.fillStyle = "red";
     plataformas.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));

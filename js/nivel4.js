@@ -50,13 +50,14 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // Cargar imágenes
-const fondo = new Image(); fondo.src = 'assets/img/fondo_2.png';
-const jugadorImg = new Image(); jugadorImg.src = 'assets/img/jugador2.png';
+const fondo = new Image(); fondo.src = 'assets/img/fondo_4.png';
+const jugadorImg = new Image(); jugadorImg.src = 'assets/img/jugador4.png';
 const monedaImg = new Image(); monedaImg.src = 'assets/img/moneda.png';
 const balonImg = new Image(); balonImg.src = 'assets/img/balon.png';
 const portalImg = new Image(); portalImg.src = 'assets/img/portal.png';
 const nivelCompletadoImg = new Image(); nivelCompletadoImg.src = 'assets/img/nivel_completado.jpg';
-const enemigoImg = new Image(); enemigoImg.src = 'assets/img/enemigo.png';
+const enemigoImg = new Image(); enemigoImg.src = 'assets/img/enemigo3.png';
+const enemigoImg2 = new Image(); enemigoImg2.src = 'assets/img/enemigo.png';
 
 // Jugador
 const jugador = {
@@ -71,13 +72,13 @@ const salto = -23;
 
 // Plataformas
 const plataformas = [
-    { x: 200, y: canvas.height - 200, width: 150, height: 20 },
-    { x: 450, y: canvas.height - 350, width: 180, height: 20 },
-    { x: 700, y: canvas.height - 500, width: 200, height: 20 },
-    { x: 1000, y: canvas.height - 600, width: 150, height: 20 },
-    { x: 1300, y: canvas.height - 450, width: 180, height: 20 },
-    { x: 1600, y: canvas.height - 300, width: 150, height: 20 },
-    { x: 1900, y: canvas.height - 200, width: 220, height: 20 }
+    { x: 150,  y: canvas.height - 150, width: 120, height: 20 },
+    { x: 400,  y: canvas.height - 250, width: 120, height: 20 },
+    { x: 650,  y: canvas.height - 350, width: 120, height: 20 },
+    { x: 900,  y: canvas.height - 450, width: 120, height: 20 },
+    { x: 1150, y: canvas.height - 550, width: 120, height: 20 },
+    { x: 1300, y: canvas.height - 650, width: 120, height: 20 },
+
 ];
 
 // Monedas
@@ -115,6 +116,13 @@ const enemigo = {
     width: 140, height: 140
 };
 
+const enemigo2 = {
+    plataformaIndex: 0,
+    x: plataformas[0].x + 50,
+    y: plataformas[0].y - 140,
+    width: 140, height: 140
+};
+
 function moverEnemigoRandom() {
     let nuevaIndex;
     do {
@@ -126,6 +134,19 @@ function moverEnemigoRandom() {
     enemigo.y = plataformas[nuevaIndex].y - enemigo.height;
 }
 setInterval(moverEnemigoRandom, 2200);
+
+
+function moverEnemigo2Random() {
+    let nuevaIndex;
+    do {
+        nuevaIndex = Math.floor(Math.random() * plataformas.length);
+    } while (nuevaIndex === enemigo2.plataformaIndex);
+
+    enemigo2.plataformaIndex = nuevaIndex;
+    enemigo2.x = plataformas[nuevaIndex].x + 50;
+    enemigo2.y = plataformas[nuevaIndex].y - enemigo2.height;
+}
+setInterval(moverEnemigo2Random, 1500);
 
 let nivelCompletado = false;
 let tiempoTransicion = 0;
@@ -239,6 +260,29 @@ function actualizar() {
         }
     }
 
+    if (
+        jugador.x < enemigo2.x + enemigo2.width &&
+        jugador.x + jugador.width > enemigo2.x &&
+        jugador.y < enemigo2.y + enemigo2.height &&
+        jugador.y + jugador.height > enemigo2.y
+    ) {
+        if (!juegoTerminado) {
+            estadoJuego.restarVida();
+
+            // Sonido y empuje
+            sonidoGolpe.currentTime = 0;
+            sonidoGolpe.play();
+            const direccion = Math.random() < 0.5 ? -1 : 1;
+            jugador.x += direccion * 250;
+            jugador.dy = -15;
+
+            if (estadoJuego.vidas <= 0) {
+                juegoTerminado = true;
+                setTimeout(() => gameOverScreen.show(), 500);
+            }
+        }
+    }
+
     anguloMoneda += 3;
     anguloPortal += 1;
 }
@@ -279,6 +323,7 @@ function dibujar() {
     ctx.restore();
 
     ctx.drawImage(enemigoImg, enemigo.x, enemigo.y, enemigo.width, enemigo.height);
+    ctx.drawImage(enemigoImg2, enemigo2.x, enemigo2.y, enemigo2.width, enemigo2.height);
 
     ctx.save();
     ctx.shadowColor = 'black';
@@ -300,7 +345,7 @@ function dibujar() {
 
 $('#continuar-btn').on('click', () => {
 
-    location.href = 'nivel3.html'; // Cambia a la ruta del siguiente nivel
+    location.href = 'nivel5.html'; // Cambia a la ruta del siguiente nivel
 
 });
 

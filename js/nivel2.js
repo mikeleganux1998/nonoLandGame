@@ -12,9 +12,9 @@ const sonidoGolpe = new Audio('assets/audio/golpe.mp3');
     sonido.load();
 });
 
-sonidoGolpe.volume = 0.5;
-sonidoSalto.volume = 0.5;
-sonidoMoneda.volume = 0.5;
+sonidoGolpe.volume = 0.3;
+sonidoSalto.volume = 0.2;
+sonidoMoneda.volume = 0.2;
 
 
 
@@ -210,14 +210,26 @@ function actualizar() {
         jugador.y < enemigo.y + enemigo.height &&
         jugador.y + jugador.height > enemigo.y
     ) {
-        if (estadoJuego.monedas > 0) {
-            estadoJuego.monedas = Math.max(0, estadoJuego.monedas - 3);
+        if (!juegoTerminado) {
+            // Restar solo 1 moneda
+            estadoJuego.monedas = Math.max(0, estadoJuego.monedas - 1);
             $('#monedasContador').text(estadoJuego.monedas);
 
+            // Sonido de golpe
             sonidoGolpe.currentTime = 0;
             sonidoGolpe.play();
+
+            // Empuje fuerte y salto leve
+            const direccion = Math.random() < 0.5 ? -1 : 1;
+            jugador.x += direccion * 250; // Empuje fuerte
+            jugador.dy = -15; // Salto por el golpe
+
+            // Revisar si se acabaron las monedas
+            if (estadoJuego.monedas <= 0) {
+                juegoTerminado = true;
+                setTimeout(() => gameOverScreen.show(), 500); // Delay visual
+            }
         }
-        jugador.x -= 50;
     }
 
     anguloMoneda += 3;
@@ -274,13 +286,9 @@ function dibujar() {
 
 
 $('#continuar-btn').on('click', () => {
-    // Puedes poner la lógica para pasar al siguiente nivel o recargar, ejemplo:
+
     location.href = 'nivel3.html'; // Cambia a la ruta del siguiente nivel
 
-    // O si quieres reiniciar el mismo nivel:
-    // location.reload();
-
-    // También puedes resetear variables o estados si quieres manejarlo así
 });
 
 const mensaje = $('#mensajeEnemigo');
@@ -288,7 +296,7 @@ mensaje.fadeIn();
 
 setTimeout(() => {
     mensaje.fadeOut(1000);
-}, 2000); // l
+}, 1200); // l
 
 
 

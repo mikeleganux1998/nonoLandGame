@@ -12,8 +12,8 @@ const sonidoMoneda = new Audio('assets/audio/moneda.mp3');
     sonido.load();
 });
 
-sonidoSalto.volume = 0.5;
-sonidoMoneda.volume = 0.5;
+sonidoSalto.volume = 0.2;
+sonidoMoneda.volume = 0.2 ;
 
 // Inicializa contadores con los valores guardados
 $('#monedasContador').text(estadoJuego.monedas);
@@ -246,7 +246,7 @@ mensaje.show();
 
 setTimeout(() => {
     mensaje.fadeOut(1000);
-}, 2000);
+}, 1300);
 
 bucle();
 

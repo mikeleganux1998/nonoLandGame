@@ -1,4 +1,4 @@
-import { estadoJuego } from './estadoJuego.js';
+import {estadoJuego} from './estadoJuego.js';
 
 // Sonidos
 const sonidoSalto = new Audio('assets/audio/salto.mp3');
@@ -10,9 +10,9 @@ const sonidoGolpe = new Audio('assets/audio/golpe.mp3');
     sonido.load();
 });
 
-sonidoGolpe.volume = 0.6;
-sonidoSalto.volume = 0.6;
-sonidoMoneda.volume = 0.6;
+sonidoGolpe.volume = 0.3;
+sonidoSalto.volume = 0.2;
+sonidoMoneda.volume = 0.2;
 
 $('#monedasContador').text(estadoJuego.monedas);
 $('#itemsContador').text(estadoJuego.items);
@@ -31,14 +31,22 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const fondo = new Image(); fondo.src = 'assets/img/fondo.png';
-const jugadorImg = new Image(); jugadorImg.src = 'assets/img/jugador3.png';
-const monedaImg = new Image(); monedaImg.src = 'assets/img/moneda.png';
-const ticketImg = new Image(); ticketImg.src = 'assets/img/ticket.png';
-const noviaImg = new Image(); noviaImg.src = 'assets/img/novia.png';
-const enemigo1Img = new Image(); enemigo1Img.src = 'assets/img/enemigo.png';
-const enemigo2Img = new Image(); enemigo2Img.src = 'assets/img/enemigo2.png';
-const nivelCompletadoImg = new Image(); nivelCompletadoImg.src = 'assets/img/nivel_completado.jpg';
+const fondo = new Image();
+fondo.src = 'assets/img/fondo.png';
+const jugadorImg = new Image();
+jugadorImg.src = 'assets/img/jugador3.png';
+const monedaImg = new Image();
+monedaImg.src = 'assets/img/moneda.png';
+const ticketImg = new Image();
+ticketImg.src = 'assets/img/ticket.png';
+const noviaImg = new Image();
+noviaImg.src = 'assets/img/novia.png';
+const enemigo1Img = new Image();
+enemigo1Img.src = 'assets/img/enemigo.png';
+const enemigo2Img = new Image();
+enemigo2Img.src = 'assets/img/enemigo2.png';
+const nivelCompletadoImg = new Image();
+nivelCompletadoImg.src = 'assets/img/nivel_completado.jpg';
 
 const images = [fondo, jugadorImg, monedaImg, ticketImg, noviaImg, enemigo1Img, enemigo2Img, nivelCompletadoImg];
 
@@ -65,12 +73,12 @@ const salto = -25;
 
 // Plataformas
 const plataformas = [
-    { x: 200, y: canvas.height - 200, width: 150, height: 20 },
-    { x: 500, y: canvas.height - 350, width: 180, height: 20 },
-    { x: 800, y: canvas.height - 500, width: 200, height: 20 },
-    { x: 1100, y: canvas.height - 600, width: 150, height: 20 },
-    { x: 1400, y: canvas.height - 280, width: 150, height: 20 } ,
-    { x: canvas.width - 300, y: 150, width: 180, height: 20 },
+    {x: 200, y: canvas.height - 200, width: 150, height: 20},
+    {x: 500, y: canvas.height - 350, width: 180, height: 20},
+    {x: 800, y: canvas.height - 500, width: 200, height: 20},
+    {x: 1100, y: canvas.height - 600, width: 150, height: 20},
+    {x: 1400, y: canvas.height - 280, width: 150, height: 20},
+    {x: canvas.width - 300, y: 150, width: 180, height: 20},
 ];
 
 // Monedas
@@ -267,9 +275,14 @@ function actualizar() {
                 teclas['ArrowLeft'] = teclas['ArrowRight'] = teclas['Space'] = false;
             }
         } else {
-            alert("Necesitas recoger el ticket para rescatar a la novia.");
-            localStorage.clear();
-            location.href = 'nivel1.html';
+            if (!$('#mensajeErrorTicket').length) {
+                const mensaje = $('<div id="mensajeErrorTicket" style="position: fixed; top: 20%; left: 50%; transform: translateX(-50%); background: rgba(255,0,0,0.8); color: white; font-family: \'Press Start 2P\', cursive; font-size: 1.1rem; padding: 1rem 2rem; border: 2px solid white; border-radius: 10px; z-index: 10000; text-align: center;">¡Primero recoge el ticket!</div>');
+                $('body').append(mensaje);
+                mensaje.fadeIn(300);
+                setTimeout(() => {
+                    mensaje.fadeOut(300, () => mensaje.remove());
+                }, 1500);
+            }
         }
     }
 
@@ -280,15 +293,24 @@ function actualizar() {
             jugador.y < enemigo.y + enemigo.height &&
             jugador.y + jugador.height > enemigo.y
         ) {
-            if (estadoJuego.monedas > 0) {
+            if (!juegoTerminado) {
                 estadoJuego.monedas = Math.max(0, estadoJuego.monedas - 3);
                 $('#monedasContador').text(estadoJuego.monedas);
 
                 sonidoGolpe.currentTime = 0;
                 sonidoGolpe.play();
-            }
 
-            jugador.x -= 50;
+                // Empuje fuerte lateral y salto tipo knockback
+                const direccion = jugador.x < enemigo.x ? -1 : 1; // Lo empuja en dirección opuesta
+                jugador.x += direccion * 180;
+                jugador.dy = -15;
+
+                // Revisar si ya se quedó sin monedas
+                if (estadoJuego.monedas <= 0) {
+                    juegoTerminado = true;
+                    setTimeout(() => gameOverScreen.fadeIn(300), 500);
+                }
+            }
         }
     });
 
@@ -378,7 +400,6 @@ function cambiarPlataformaEnemigo(enemigo) {
 }
 
 
-
 function loop() {
     actualizar();
     dibujar();
@@ -407,5 +428,5 @@ function mostrarMensajeCapturaTicket() {
         mensaje.fadeOut(300, () => {
             mensaje.remove();
         });
-    }, 3000);
+    }, 1200);
 }
